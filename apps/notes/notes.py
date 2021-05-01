@@ -30,20 +30,15 @@ def read_note(id: UUID4):
     return NoteResponse.from_orm(note)
 
 
-@router.put("/{id}", response_model=NoteDB)
-async def update_note(payload: NoteSchema, id: int = Path(..., gt=0)):
-    note = await crud.get(id)
+@router.put("/{id}", response_model=NoteResponse)
+async def update_note(payload: NoteSchema, id: UUID4):
+    note = crud.get(id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
 
-    note_id = await crud.put(id, payload)
+    await crud.put(id, payload)
 
-    response_object = {
-        "id": note_id,
-        "title": payload.title,
-        "description": payload.description,
-    }
-    return response_object
+    return NoteResponse(id=id, **payload.dict())
 
 
 @router.delete("/{id}", response_model=NoteDB)

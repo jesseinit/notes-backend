@@ -25,14 +25,20 @@ def get(id: UUID4):
     return note
 
 
-async def put(id: int, payload: NoteSchema):
+async def put(id: UUID4, payload: NoteSchema):
+    from sqlalchemy import update
+
     query = (
-        Notes.update()
-        .where(id == Notes.c.id)
-        .values(title=payload.title, description=payload.description)
-        .returning(Notes.c.id)
+        update(NotesModel)
+        .where(NotesModel.id == id)
+        .values(**payload.dict())
+        .execution_options(synchronize_session="fetch")
     )
-    return await database.execute(query=query)
+
+    # print("type", type(query))
+    update_result = await database.execute(query=query)
+    print("update_result>>>", update_result)
+    return update_result
 
 
 async def delete(id: int):
