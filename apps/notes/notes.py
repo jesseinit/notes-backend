@@ -1,10 +1,10 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException
 from pydantic.types import UUID4
 
 from apps.notes import crud
-from apps.notes.schema import NoteDB, NoteResponse, NoteSchema
+from apps.notes.schema import NoteResponse, NoteSchema
 
 
 router = APIRouter()
@@ -41,12 +41,11 @@ async def update_note(payload: NoteSchema, id: UUID4):
     return NoteResponse(id=id, **payload.dict())
 
 
-@router.delete("/{id}", response_model=NoteDB)
-async def delete_note(id: int = Path(..., gt=0)):
-    note = await crud.get(id)
+@router.delete("/{id}", response_model=NoteResponse)
+async def delete_note(id: UUID4):
+    note = crud.get(id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
 
     await crud.delete(id)
-
-    return note
+    return NoteResponse.from_orm(note)
