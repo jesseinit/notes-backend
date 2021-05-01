@@ -1,9 +1,16 @@
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
-from app.api import notes
 
-from app.db import engine, database, metadata
+load_dotenv()
 
-metadata.create_all(engine)
+from apps.notes import notes
+
+DATABASE_URL = os.environ["DATABASE_URL"]
+from db.session import database
+
+# metadata.create_all(engine)
 
 app = FastAPI()
 
@@ -16,5 +23,6 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
+
 
 app.include_router(notes.router, prefix="/notes", tags=["Notes Resource"])

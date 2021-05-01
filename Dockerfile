@@ -21,4 +21,4 @@ RUN pip install --upgrade pip setuptools wheel \
   && rm -rf /root/.cache/pip
 
 # copy project
-COPY . /usr/src/app/
+COPY . .

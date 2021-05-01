@@ -4,7 +4,7 @@ services:
   api:
     build: .
     container_name: notes-api
-    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8022
+    command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8022
     volumes:
       - .:/usr/src/app/
     ports:
@@ -14,6 +14,7 @@ services:
 
   db:
     image: postgres:12
+    container_name: notes-db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     expose:
