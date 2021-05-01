@@ -20,7 +20,7 @@ Test out the following routes:
 Run automated integrated tests with the following commands
 
 ```sh
-$ docker-compose exec api pytest
+$ docker-compose run api python -m pytest
 ```
 
 ## Built With
