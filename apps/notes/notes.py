@@ -18,6 +18,7 @@ def create_note(payload: NoteSchema):
 @router.get("", response_model=List[NoteResponse])
 def read_all_notes():
     all_notes = crud.get_all()
+    print(vars(all_notes[0]))
     return [NoteResponse.from_orm(note) for note in all_notes]
 
 

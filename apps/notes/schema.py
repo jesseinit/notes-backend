@@ -1,4 +1,14 @@
+from enum import Enum
+from typing import Union
+
 from pydantic import UUID4, BaseModel, Field
+
+
+class NoteStatus(str, Enum):
+    deleted = "deleted"
+    pubished = "pubished"
+    draft = "draft"
+    archived = "archived"
 
 
 class NoteSchema(BaseModel):
@@ -8,6 +18,8 @@ class NoteSchema(BaseModel):
 
 class NoteResponse(NoteSchema):
     id: UUID4
+    status: Union[None, NoteStatus]
 
     class Config:
         orm_mode = True
+        use_enum_values = True

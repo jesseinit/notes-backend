@@ -1,23 +1,28 @@
+import enum
 from uuid import uuid4
 
-from sqlalchemy import Column, String, Text, DateTime
-from sqlalchemy.dialects.postgresql import UUID, ENUM
+from sqlalchemy import Column, DateTime, String, Text
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.sql import func
-import enum
+
 from db.base import Base
 
 
 class NoteStatus(enum.Enum):
-    deleted = "deleted"
-    pubished = "pubished"
-    draft = "draft"
-    archived = "archived"
+    DELETED = "DELETED"
+    PUBLISHED = "PUBLISHED"
+    DRAFT = "DRAFT"
+    ARCHIVED = "ARCHIVED"
 
 
 class Notes(Base):
     title = Column(String)
     description = Column(Text)
-    # status = Column(ENUM(NoteStatus), default=NoteStatus.pubished.value, nullable=True)
+    status = Column(
+        ENUM(NoteStatus),
+        default=NoteStatus.PUBLISHED.value,
+        nullable=True,
+    )
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
