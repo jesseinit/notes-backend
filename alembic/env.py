@@ -3,8 +3,8 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
 
-from main import DATABASE_URL
 from alembic import context
+from main import DATABASE_URL
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,8 +25,8 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-from db.base import Base
 import apps.notes.models
+from db.base import Base
 
 target_metadata = Base.metadata
 

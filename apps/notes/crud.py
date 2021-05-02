@@ -1,11 +1,11 @@
 from typing import List, Union
-from pydantic.types import UUID4
-from db.session import session
-from apps.notes.schema import NoteSchema
-from apps.notes.models import Notes as NotesModel
 
+from pydantic.types import UUID4
 from sqlalchemy.dialects.postgresql import UUID
-from db.session import database
+
+from apps.notes.models import Notes as NotesModel
+from apps.notes.schema import NoteSchema
+from db.session import database, session
 
 
 def post(payload: NoteSchema) -> NotesModel:

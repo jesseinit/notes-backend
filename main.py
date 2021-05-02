@@ -8,9 +8,8 @@ load_dotenv()
 from apps.notes import notes
 
 DATABASE_URL = os.environ["DATABASE_URL"]
-from db.session import database
 
-# metadata.create_all(engine)
+from db.session import database
 
 app = FastAPI()
 

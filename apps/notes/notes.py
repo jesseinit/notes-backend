@@ -6,7 +6,6 @@ from pydantic.types import UUID4
 from apps.notes import crud
 from apps.notes.schema import NoteResponse, NoteSchema
 
-
 router = APIRouter()
 
 

@@ -1,7 +1,7 @@
 """Create Notes Table
 
 Revision ID: ca0d53ad8eb3
-Revises: 
+Revises:
 Create Date: 2021-05-01 00:04:50.736520
 
 """
