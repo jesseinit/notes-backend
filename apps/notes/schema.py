@@ -18,7 +18,7 @@ class NoteSchema(BaseModel):
 
 class NoteResponse(NoteSchema):
     id: UUID4
-    status: Union[None, NoteStatus]
+    # status: Union[None, NoteStatus]
 
     class Config:
         orm_mode = True
