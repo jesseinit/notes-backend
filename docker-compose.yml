@@ -4,9 +4,9 @@ services:
   api:
     build: .
     container_name: notes-api
-    command: sh -c "alembic upgrade head && uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8022"
+    # command: sh -c "alembic upgrade head && uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8022"
     volumes:
-      - .:/usr/src/app/
+      - .:/app
     ports:
       - 8022:8022
     environment:
@@ -17,12 +17,17 @@ services:
     container_name: notes-db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    expose:
-      - 5432
+    ports:
+      - "5435:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=notes_db
-
+    entrypoint:
+      - docker-entrypoint.sh
+      - -c
+      - log_statement=all
+      - -c
+      - log_destination=stderr
 volumes:
   postgres_data:

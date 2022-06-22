@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic.types import UUID4
 
 from apps.notes import crud
-from apps.notes.schema import NoteResponse, NoteSchema
+from apps.notes.notes_schema import NoteResponse, NoteSchema, PatchNoteSchema
 
 router = APIRouter()
 
@@ -30,15 +30,15 @@ def read_note(id: UUID4):
     return NoteResponse.from_orm(note)
 
 
-@router.put("/{id}", response_model=NoteResponse)
-async def update_note(payload: NoteSchema, id: UUID4):
+@router.patch("/{id}", response_model=NoteResponse)
+async def patch_note(payload: PatchNoteSchema, id: UUID4):
     note = crud.get(id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
-
-    await crud.put(id, payload)
-
-    return NoteResponse(id=id, **payload.dict())
+    await crud.put(id, payload.dict(exclude_none=True))
+    #TODO - Currently the get call to get note instance returns stale values. We have to figure a way to return the updated instance with a single call.
+    note = crud.get(id)
+    return NoteResponse.from_orm(note)
 
 
 @router.delete("/{id}", response_model=NoteResponse)

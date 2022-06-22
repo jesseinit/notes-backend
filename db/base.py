@@ -5,8 +5,6 @@ from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
-# p = inflect.engine()
-
 
 @as_declarative()
 class Base:
