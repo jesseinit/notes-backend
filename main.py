@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 load_dotenv()
 
-from apps.notes import notes_view
+from apps.notes import notes_view as note_app
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
@@ -24,4 +24,4 @@ async def shutdown():
     await database.disconnect()
 
 
-app.include_router(notes_view.router, prefix="/notes", tags=["Notes Resource"])
+app.include_router(note_app.router, prefix="/notes", tags=["Notes Resource"])
