@@ -26,6 +26,7 @@ fileConfig(config.config_file_name)
 # target_metadata = mymodel.Base.metadata
 
 import apps.notes.models
+import apps.users.models
 from db.base import Base
 
 target_metadata = Base.metadata

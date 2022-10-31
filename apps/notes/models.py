@@ -1,10 +1,8 @@
-import enum
-from uuid import uuid4
-
-from sqlalchemy import Column, DateTime, Integer, String, Text
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Column, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from sqlalchemy_utils import ChoiceType
+from sqlalchemy.dialects.postgresql import UUID
 
 from db.base import Base
 
@@ -25,11 +23,8 @@ class Notes(Base):
         default=NOTESTATE[1][0],
         nullable=False,
     )
-    created_at = Column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
-    deleted_at = Column(DateTime(timezone=True), default=None, nullable=True)
+    owner_id = Column(UUID, ForeignKey("users.id"))
+    owner = relationship("Users", back_populates="notes")
 
     def __str__(self) -> str:
         return f"<NotesModel title={self.title}>"

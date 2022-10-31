@@ -18,7 +18,6 @@ def create_note(payload: NoteSchema):
 @router.get("", response_model=List[NoteResponse])
 def read_all_notes():
     all_notes = crud.get_all()
-    print(vars(all_notes[0]))
     return [NoteResponse.from_orm(note) for note in all_notes]
 
 
@@ -36,7 +35,7 @@ async def patch_note(payload: PatchNoteSchema, id: UUID4):
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
     await crud.put(id, payload.dict(exclude_none=True))
-    #TODO - Currently the get call to get note instance returns stale values. We have to figure a way to return the updated instance with a single call.
+    # TODO - Currently the get call to get note instance returns stale values. We have to figure a way to return the updated instance with a single call.
     note = crud.get(id)
     return NoteResponse.from_orm(note)
 
