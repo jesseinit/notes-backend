@@ -1,5 +1,3 @@
-import os
-
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -8,9 +6,6 @@ load_dotenv()
 
 from apps.notes import notes_view as note_app
 from apps.users import users_view as user_app
-
-DATABASE_URL = os.environ["DATABASE_URL"]
-
 from db.session import database
 
 app = FastAPI()

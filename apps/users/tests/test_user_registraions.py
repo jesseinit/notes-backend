@@ -28,19 +28,14 @@ def test_register_user__success(test_app, monkeypatch):
 
 def test_register_user__exisiting_user(test_app, monkeypatch):
     test_request_payload = {
-        "username": "bingoman",
+        "username": "bingoman2",
         "first_name": "Jesse",
         "last_name": "Egbosionu",
-        "email": "jesseinit@gmail.com",
+        "email": "jesseinit2@gmail.com",
         "password": "bigmanthing",
     }
 
-    monkeypatch.setattr(
-        crud, "create_user", lambda x: UserFactory(**test_request_payload)
-    )
-    monkeypatch.setattr(
-        crud, "get_existing_user", lambda **kwargs: UserFactory(**test_request_payload)
-    )
+    UserFactory(**test_request_payload)
 
     response = test_app.post(
         app.url_path_for("register_user"),
