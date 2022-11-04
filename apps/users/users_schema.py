@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Optional, Union
 from uuid import UUID
 
-from pydantic import UUID4, BaseModel, Field
+from pydantic import UUID4, BaseModel, Field, EmailStr
 
 
 class UserStatus(str, Enum):
@@ -21,7 +21,7 @@ class CreateUserInputSchema(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     first_name: str = Field(..., min_length=3, max_length=50)
     last_name: str = Field(..., min_length=3, max_length=50)
-    email: str = Field(..., min_length=3, max_length=50)
+    email: EmailStr
     password: str = Field(..., min_length=3, max_length=50)
 
 

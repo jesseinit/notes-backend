@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import JSONResponse
+from http import HTTPStatus
+
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse, Response
 from pydantic.types import UUID4
 
 from apps.notes import crud
@@ -35,7 +37,7 @@ def read_note(id: UUID4, current_user: JWTBearer = Depends(JWTBearer())):
                 "msg": "Notes not found.",
                 "data": None,
             },
-            status_code=400,
+            status_code=HTTPStatus.BAD_REQUEST,
         )
     return {
         "msg": "Notes retreived.",
@@ -54,7 +56,7 @@ def patch_note(
                 "msg": "Notes not found.",
                 "data": None,
             },
-            status_code=400,
+            status_code=HTTPStatus.BAD_REQUEST,
         )
     note = crud.update_note(
         id, payload.dict(exclude_none=True), owner_id=current_user.id
@@ -65,21 +67,16 @@ def patch_note(
     }
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", status_code=204)
 def delete_note(id: UUID4, current_user: JWTBearer = Depends(JWTBearer())):
     note = crud.get_note_for_delete(note_id=id, owner_id=current_user.id)
-    print(note)
     if not note:
         return JSONResponse(
             content={
                 "msg": "Notes not found.",
                 "data": None,
             },
-            status_code=400,
+            status_code=HTTPStatus.BAD_REQUEST,
         )
-
     crud.delete_note(note_id=id, owner_id=current_user.id)
-    return {
-        "msg": "Notes deleted.",
-        "data": None,
-    }
+    return Response(status_code=HTTPStatus.NO_CONTENT.value)

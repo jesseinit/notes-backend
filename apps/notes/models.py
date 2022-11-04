@@ -1,8 +1,7 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-from sqlalchemy_utils import ChoiceType
+from sqlalchemy import Column, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+from sqlalchemy_utils import ChoiceType
 
 from db.base import Base
 

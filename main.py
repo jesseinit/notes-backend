@@ -8,7 +8,7 @@ from apps.notes import notes_view as note_app
 from apps.users import users_view as user_app
 from db.session import database
 
-app = FastAPI()
+app = FastAPI(title="Notes API")
 
 
 @app.on_event("startup")
@@ -29,7 +29,7 @@ async def unicorn_exception_handler(request: Request, exc: Exception):
     )
 
 
-@app.get("/", status_code=200)
+@app.get("/", status_code=200, tags=["Home"])
 def index():
     return {"msg": "The App is Running", "data": None}
 
