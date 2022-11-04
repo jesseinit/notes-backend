@@ -19,4 +19,4 @@ echo Running Alembic Migrations.
 alembic upgrade head
 
 echo Starting API Server.
-uvicorn main:app --reload --workers $WORKER_COUNT --reload --host 0.0.0.0 --port 8022
+uvicorn main:app --reload --workers $WORKER_COUNT --debug --host 0.0.0.0 --port 8022

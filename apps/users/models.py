@@ -1,4 +1,3 @@
-from passlib.context import CryptContext
 from sqlalchemy import Boolean, Column, String, event
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import ChoiceType
@@ -36,5 +35,6 @@ class Users(Base):
 
 @event.listens_for(Users, "before_insert")
 def update_user_password(mapper, connect, instance):
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    instance.password = pwd_context.hash(instance.password)
+    from helpers.utils import HashManager
+
+    instance.password = HashManager.hash_password(instance.password)

@@ -1,50 +1,81 @@
-from typing import List
-
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from pydantic.types import UUID4
 
 from apps.notes import crud
-from apps.notes.notes_schema import NoteResponse, NoteSchema, PatchNoteSchema
+from apps.notes.notes_schema import CreateNoteSchema, NoteResponse, PatchNoteSchema
+from helpers.utils import JWTBearer
 
 router = APIRouter()
 
 
 @router.post("", response_model=NoteResponse, status_code=201)
-def create_note(payload: NoteSchema):
-    new_note = crud.post(payload)
+def create_note(
+    payload: CreateNoteSchema, current_user: JWTBearer = Depends(JWTBearer())
+):
+    new_note = crud.create_new_note(payload, owner_id=current_user.id)
     return NoteResponse.from_orm(new_note)
 
 
-@router.get("", response_model=List[NoteResponse])
-def read_all_notes():
-    all_notes = crud.get_all()
-    return [NoteResponse.from_orm(note) for note in all_notes]
+@router.get("")
+def read_all_notes(current_user: JWTBearer = Depends(JWTBearer())):
+    all_notes = crud.get_all_user_notes(current_user)
+    return {
+        "msg": "Notes Retrieved",
+        "data": [NoteResponse.from_orm(note) for note in all_notes],
+    }
 
 
-@router.get("/{id}", response_model=NoteResponse)
-def read_note(id: UUID4):
-    note = crud.get(id)
+@router.get("/{id}")
+def read_note(id: UUID4, current_user: JWTBearer = Depends(JWTBearer())):
+    note = crud.get_note(note_id=id, owner_id=current_user.id)
     if not note:
-        raise HTTPException(status_code=404, detail="Note not found")
+        return JSONResponse(
+            content={
+                "msg": "Notes not found.",
+                "data": None,
+            },
+            status_code=400,
+        )
+    return {
+        "msg": "Notes retreived.",
+        "data": NoteResponse.from_orm(note),
+    }
+
+
+@router.patch("/{id}")
+def patch_note(
+    payload: PatchNoteSchema, id: UUID4, current_user: JWTBearer = Depends(JWTBearer())
+):
+    note = crud.get_note(note_id=id, owner_id=current_user.id)
+    if not note:
+        return JSONResponse(
+            content={
+                "msg": "Notes not found.",
+                "data": None,
+            },
+            status_code=400,
+        )
+    note = crud.update_note(
+        id, payload.dict(exclude_none=True), owner_id=current_user.id
+    )
     return NoteResponse.from_orm(note)
 
 
-@router.patch("/{id}", response_model=NoteResponse)
-async def patch_note(payload: PatchNoteSchema, id: UUID4):
-    note = crud.get(id)
+@router.delete("/{id}")
+def delete_note(id: UUID4, current_user: JWTBearer = Depends(JWTBearer())):
+    note = crud.get_note_for_delete(note_id=id, owner_id=current_user.id)
     if not note:
-        raise HTTPException(status_code=404, detail="Note not found")
-    await crud.put(id, payload.dict(exclude_none=True))
-    # TODO - Currently the get call to get note instance returns stale values. We have to figure a way to return the updated instance with a single call.
-    note = crud.get(id)
-    return NoteResponse.from_orm(note)
+        return JSONResponse(
+            content={
+                "msg": "Notes not found.",
+                "data": None,
+            },
+            status_code=400,
+        )
 
-
-@router.delete("/{id}", response_model=NoteResponse)
-async def delete_note(id: UUID4):
-    note = crud.get(id)
-    if not note:
-        raise HTTPException(status_code=404, detail="Note not found")
-
-    await crud.delete(id)
-    return NoteResponse.from_orm(note)
+    crud.delete_note(note_id=id, owner_id=current_user.id)
+    return {
+        "msg": "Notes deleted.",
+        "data": None,
+    }

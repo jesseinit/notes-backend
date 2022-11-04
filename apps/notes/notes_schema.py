@@ -12,15 +12,15 @@ class NoteStatus(str, Enum):
     archived = "ARCHIVED"
 
 
-class NoteSchema(BaseModel):
+class CreateNoteSchema(BaseModel):
     title: str = Field(..., min_length=3, max_length=50)
     description: str = Field(..., min_length=3, max_length=1000000)
 
 
-class NoteResponse(NoteSchema):
+class NoteResponse(BaseModel):
     id: UUID4
-    title: str = Field(..., min_length=3, max_length=50)
-    description: str = Field(..., min_length=3, max_length=1000000)
+    title: str
+    description: str
     status: Union[None, NoteStatus]
     created_at: datetime
     updated_at: Union[None, datetime]
@@ -30,9 +30,10 @@ class NoteResponse(NoteSchema):
         orm_mode = True
         use_enum_values = True
 
+
 class PatchNoteSchema(BaseModel):
     title: Optional[str]
-    description: Optional[str] #= Field(..., min_length=3, max_length=1000000)
+    description: Optional[str]  # = Field(..., min_length=3, max_length=1000000)
     status: Optional[NoteStatus]
 
     # class Config:

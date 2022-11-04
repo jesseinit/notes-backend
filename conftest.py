@@ -3,7 +3,7 @@ import os
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import close_all_sessions
-from sqlalchemy_utils.functions import create_database, database_exists, drop_database
+from sqlalchemy_utils.functions import create_database, database_exists
 from starlette.testclient import TestClient
 
 from db.base import metadata

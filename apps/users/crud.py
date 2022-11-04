@@ -1,10 +1,10 @@
 from typing import Union
 
-from sqlalchemy import delete, insert, or_, select, update
+from sqlalchemy import or_
 
 from apps.users.models import Users as UsersModel
 from apps.users.users_schema import CreateUserInputSchema
-from db.session import database, session
+from db.session import session
 
 
 def create_user(payload: CreateUserInputSchema) -> UsersModel:
@@ -21,4 +21,11 @@ def get_existing_user(username: str, email: str) -> Union[None, UsersModel]:
         .filter(or_(UsersModel.username == username, UsersModel.email == email))
         .first()
     )
+    return user
+
+
+def get_user_by_username(
+    username: str,
+) -> Union[None, UsersModel]:
+    user = session.query(UsersModel).filter_by(username=username).first()
     return user

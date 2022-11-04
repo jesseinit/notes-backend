@@ -1,30 +1,61 @@
-from typing import List
-
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
-from apps.users import crud
-from apps.users.users_schema import CreatedUserSchema, CreateUserInputSchema
+import apps.users.users_schema as user_schemas
+from apps.users import crud as UserDAL
+from helpers.utils import HashManager, JWTBearer
 
 router = APIRouter()
 
 
 @router.post("/auth/register", status_code=201)
-def register_user(payload: CreateUserInputSchema):
-    user = crud.get_existing_user(username=payload.username, email=payload.email)
+def register_user(payload: user_schemas.CreateUserInputSchema):
+    user = UserDAL.get_existing_user(username=payload.username, email=payload.email)
     if user:
         return JSONResponse(
             content={"msg": "Username or Email has been taken", "data": None},
             status_code=409,
         )
-    new_user = crud.create_user(payload)
-    return {"msg": "Signup Successful", "data": CreatedUserSchema.from_orm(new_user)}
+    new_user = UserDAL.create_user(payload)
+    return {
+        "msg": "Signup Successful",
+        "data": user_schemas.CreatedUserSchema.from_orm(new_user),
+    }
 
 
-# @router.get("", response_model=List[NoteResponse])
-# def read_all_notes():
-#     all_notes = crud.get_all()
-#     return [NoteResponse.from_orm(note) for note in all_notes]
+@router.post("/auth/login", status_code=200)
+def login_user(payload: user_schemas.UserLoginInputSchema):
+
+    user = UserDAL.get_user_by_username(username=payload.username)
+    if not user:
+        return JSONResponse(
+            content={"msg": "Invalid login credentials", "data": None},
+            status_code=404,
+        )
+
+    is_valid_password = HashManager.verify_password(payload.password, user.password)
+    if not is_valid_password:
+        return JSONResponse(
+            content={"msg": "Invalid login credentials", "data": None},
+            status_code=400,
+        )
+
+    return {
+        "msg": "Login Successful",
+        "data": {
+            "access_token": HashManager.encode_data(
+                dict(id=str(user.id), username=user.username)
+            )
+        },
+    }
+
+
+@router.get("/me", status_code=200)
+def user_profile(current_user: JWTBearer = Depends(JWTBearer())):
+    return {
+        "msg": "Profile Retrieved",
+        "data": user_schemas.CreatedUserSchema.from_orm(current_user),
+    }
 
 
 # @router.get("/{id}", response_model=NoteResponse)

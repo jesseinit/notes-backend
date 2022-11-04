@@ -57,6 +57,8 @@ virtualenv = "^20.4.4"
 passlib = "^1.7.4"
 factory-boy = "^3.2.1"
 pytest-env = "^0.8.1"
+pyjwt = "^2.6.0"
+python-decouple = "^3.6"
 
 
 [build-system]

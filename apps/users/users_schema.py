@@ -12,6 +12,11 @@ class UserStatus(str, Enum):
     ARCHIVED = "ARCHIVED"
 
 
+class UserLoginInputSchema(BaseModel):
+    username: str = Field(..., min_length=3, max_length=50)
+    password: str = Field(..., min_length=3, max_length=50)
+
+
 class CreateUserInputSchema(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     first_name: str = Field(..., min_length=3, max_length=50)
