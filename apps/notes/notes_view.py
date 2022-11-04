@@ -59,12 +59,16 @@ def patch_note(
     note = crud.update_note(
         id, payload.dict(exclude_none=True), owner_id=current_user.id
     )
-    return NoteResponse.from_orm(note)
+    return {
+        "msg": "Notes retreived.",
+        "data": NoteResponse.from_orm(note),
+    }
 
 
 @router.delete("/{id}")
 def delete_note(id: UUID4, current_user: JWTBearer = Depends(JWTBearer())):
     note = crud.get_note_for_delete(note_id=id, owner_id=current_user.id)
+    print(note)
     if not note:
         return JSONResponse(
             content={
