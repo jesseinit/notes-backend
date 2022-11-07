@@ -6,6 +6,10 @@ start:
 	@echo "=========Starting API========="
 	docker compose up
 
+stop:
+	@echo "=========Stoping API========="
+	docker compose down
+
 start-local-registry:
 	@echo "=========Starting Local Docker Registry========="
 	docker run -d -p 5001:5000 --restart=always --name kind-registry registry:2
