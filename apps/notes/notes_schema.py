@@ -1,6 +1,6 @@
+from datetime import datetime
 from enum import Enum
 from typing import Optional, Union
-from datetime import datetime
 
 from pydantic import UUID4, BaseModel, Field
 
@@ -33,9 +33,5 @@ class NoteResponse(BaseModel):
 
 class PatchNoteSchema(BaseModel):
     title: Optional[str]
-    description: Optional[str]  # = Field(..., min_length=3, max_length=1000000)
+    description: Optional[str]
     status: Optional[NoteStatus]
-
-    # class Config:
-    #     orm_mode = True
-    #     use_enum_values = True

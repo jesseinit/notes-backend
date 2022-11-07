@@ -11,8 +11,10 @@ services:
       - venv_data:/app/.venv 
       - .:/app
     ports:
-      - 8022:8022
+      - 8023:8022
     environment:
+      - DATABASE_HOST=notes-db
+      - DATABASE_PORT=5432
       - DATABASE_URL=postgresql://postgres:postgres@db/notes_db
       - DATABASE_URL_TEST=postgresql://postgres:postgres@db/notes_db_test
     # These lines has been added to enable the use of breakpoints in debugging

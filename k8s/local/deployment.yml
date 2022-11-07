@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: note-api-deployment
+  labels:
+    app: note-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: note-api
+  template:
+    metadata:
+      labels:
+        app: note-api
+    spec:
+      containers:
+      - name: notes-api
+        image: localhost:5000/notes-api:latest
+        ports:
+          - containerPort: 8022
+        env:
+          - name:  DATABASE_HOST
+            value: "postgresql-dev.default.svc.cluster.local"
+          - name:  DATABASE_PORT
+            value: "5432"
+          - name:  DATABASE_URL
+            value: "postgresql://postgres:postgres@postgresql-dev.default.svc.cluster.local/notes_db"
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: "1"
+          requests:
+            memory: 256Mi
+            cpu: "0.2"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name:  note-api-service
+spec:
+  selector:
+    app:  note-api
+  type:  NodePort
+  ports:
+  - name:  note-api-port
+    nodePort: 30000
+    port:  8023
+    targetPort:  8022

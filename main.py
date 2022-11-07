@@ -34,5 +34,5 @@ def index():
     return {"msg": "The App is Running", "data": None}
 
 
-app.include_router(user_app.router, prefix="/v1/users", tags=["Users Resource"])
-app.include_router(note_app.router, prefix="/v1/notes", tags=["Notes Resource"])
+app.include_router(user_app.router, prefix="/v1/user", tags=["Users Resource"])
+app.include_router(note_app.router, prefix="/v1/note", tags=["Notes Resource"])
