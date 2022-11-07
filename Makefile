@@ -2,6 +2,11 @@ build:
 	@echo "=========Building API Image========="
 	docker build -t notes-api .
 
+bootstrap:
+	@echo "=========Bootstraping API========="
+	make build
+	make start
+
 start:
 	@echo "=========Starting API========="
 	docker compose up

@@ -7,20 +7,17 @@ A note taking application that exposes a RESTful webservice interface which allo
 Build the images and run the containers:
 
 ```sh
-$ docker-compose up -d --build
+make bootstrap
 ```
 
-Test out the following routes:
-
-1. [http://localhost:8022/docs](http://localhost:8003/docs)
-1. [http://localhost:8022/notes](http://localhost:8003/notes)
+Read the API Documentation on [here](http://localhost:8023/docs)
 
 ## Automated Tests
 
-Run automated integrated tests with the following commands
+Ensure api container is running the run automated integrated tests with
 
 ```sh
-$ docker-compose run api python -m pytest
+$ docker exec -it notes-api pytest
 ```
 
 ## Built With
