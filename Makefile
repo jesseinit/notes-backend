@@ -28,10 +28,9 @@ create:
 	@echo "=========Creating Kind Cluster========="
 	kind create cluster --config k8s/local/cluster.yml
 	@echo "=========Installing Database Workloads========="
-	helm install postgresql-dev -f k8s/local/values.yml bitnami/postgresql
-	kubectl apply -f k8s/local/local-pv.yml
-	kubectl apply -f k8s/local/pv-claim.yml
-	kubectl apply -f k8s/local/deployment.yml
+	kubectl apply -f k8s/local/database.yml
+	@echo "=========Applying Notes API Workloads========="
+	kubectl apply -f k8s/local/notes-api.yml   
 
 destroy:
 	@echo "=========Destroying Kind Cluster========="
