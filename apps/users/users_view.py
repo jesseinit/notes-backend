@@ -25,7 +25,6 @@ def register_user(payload: user_schemas.CreateUserInputSchema):
 
 @router.post("/auth/login", status_code=200)
 def login_user(payload: user_schemas.UserLoginInputSchema):
-
     user = UserDAL.get_user_by_username(username=payload.username)
     if not user:
         return JSONResponse(

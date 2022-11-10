@@ -62,6 +62,10 @@ class JWTBearer(HTTPBearer):
                     status_code=403, detail="Invalid token or expired token."
                 )
             user = UserDAL.get_user_by_username(username=auth_payload.get("username"))
+            if not user:
+                raise HTTPException(
+                    status_code=403, detail="Invalid token or expired token."
+                )
             return user
         else:
             raise HTTPException(status_code=403, detail="Invalid authorization code.")

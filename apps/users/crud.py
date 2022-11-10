@@ -24,8 +24,6 @@ def get_existing_user(username: str, email: str) -> Union[None, UsersModel]:
     return user
 
 
-def get_user_by_username(
-    username: str,
-) -> Union[None, UsersModel]:
+def get_user_by_username(username: str) -> Union[None, UsersModel]:
     user = session.query(UsersModel).filter_by(username=username).first()
     return user

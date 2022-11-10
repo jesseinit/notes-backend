@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from pydantic.error_wrappers import ValidationError
 
 load_dotenv()
 
@@ -19,6 +20,14 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
+
+
+@app.exception_handler(ValidationError)
+async def validation_handler(request: Request, exc: ValidationError):
+    return JSONResponse(
+        status_code=400,
+        content={"msg": f"Oops! Validation Error Occured", "data": exc.errors()},
+    )
 
 
 @app.exception_handler(Exception)

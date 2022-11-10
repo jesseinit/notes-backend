@@ -1,6 +1,6 @@
 build:
 	@echo "=========Building API Image========="
-	docker build -t notes-api .
+	docker build -t notes-api:arm64 .
 
 bootstrap:
 	@echo "=========Bootstraping API========="
@@ -17,14 +17,14 @@ stop:
 
 start-local-registry:
 	@echo "=========Starting Local Docker Registry========="
-	docker run -d -p 5001:5000 --restart=always --name kind-registry registry:2
+	docker run -d -p 5001:5000 --restart=unless-stopped --name kind-registry --net kind registry:2
 
 push-locally:
 	@echo "=========Pushing to Local Docker Registry========="
-	docker tag notes-api:latest localhost:5001/notes-api:latest
-	docker push localhost:5001/notes-api:latest
+	docker tag notes-api:arm64 localhost:5001/notes-api:arm64
+	docker push localhost:5001/notes-api:arm64
 
-create:
+kind-create:
 	@echo "=========Creating Kind Cluster========="
 	kind create cluster --config k8s/local/cluster.yml
 	@echo "=========Installing Database Workloads========="
@@ -32,6 +32,16 @@ create:
 	@echo "=========Applying Notes API Workloads========="
 	kubectl apply -f k8s/local/notes-api.yml   
 
-destroy:
+kind-destroy:
 	@echo "=========Destroying Kind Cluster========="
 	kind delete cluster --name notes-api-cluster 
+
+plan:
+	cd iac && terraform plan
+
+apply:
+	cd iac && terraform apply --auto-approve
+
+destroy:
+	cd iac && terraform destroy --auto-approve
+	
