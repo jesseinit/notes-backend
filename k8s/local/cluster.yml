@@ -21,7 +21,4 @@ nodes:
       - containerPort: 443
         hostPort: 443
         protocol: TCP
-      - containerPort: 30000
-        hostPort: 8023
-        protocol: TCP
   - role: worker

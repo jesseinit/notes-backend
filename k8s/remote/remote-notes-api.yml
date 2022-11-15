@@ -36,6 +36,11 @@ spec:
           envFrom:
             - configMapRef:
                 name: note-api-configmap
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8022
+            initialDelaySeconds: 2
           resources:
             limits:
               memory: 512Mi

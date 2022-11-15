@@ -42,6 +42,10 @@ async def unicorn_exception_handler(request: Request, exc: Exception):
 def index():
     return {"msg": "The App is Running", "data": None}
 
+@app.get("/health", status_code=200, tags=["Home"])
+def health():
+    return {"msg": "The App is Running", "data": None}
+
 
 app.include_router(user_app.router, prefix="/v1/user", tags=["Users Resource"])
 app.include_router(note_app.router, prefix="/v1/note", tags=["Notes Resource"])

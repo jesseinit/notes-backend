@@ -16,10 +16,14 @@ resource "helm_release" "notes-api-cert-manager" {
   namespace        = "cert-manager"
   create_namespace = true
 
-
   set {
     name  = "installCRDs"
     value = "true"
+  }
+
+  set {
+    name  = "startupapicheck.timeout"
+    value = "5m"
   }
 
 }
@@ -46,6 +50,9 @@ data "kubectl_file_documents" "remote-le-cluster-issuer" {
 resource "kubectl_manifest" "remote-le-cluster-issuer" {
   for_each  = data.kubectl_file_documents.remote-le-cluster-issuer.manifests
   yaml_body = each.value
+  depends_on = [
+    helm_release.notes-api-cert-manager
+  ]
 }
 
 data "kubectl_file_documents" "remote-ingress" {

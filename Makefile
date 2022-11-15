@@ -1,6 +1,7 @@
 build:
 	@echo "=========Building API Image========="
 	docker build -t notes-api:arm64 .
+	docker buildx build --platform linux/amd64 -t notes-api:amd64 .
 
 bootstrap:
 	@echo "=========Bootstraping API========="
@@ -23,6 +24,12 @@ push-locally:
 	@echo "=========Pushing to Local Docker Registry========="
 	docker tag notes-api:arm64 localhost:5001/notes-api:arm64
 	docker push localhost:5001/notes-api:arm64
+
+push:
+	@echo "=========Pushing to Remote Registry========="
+	docker buildx build --platform linux/amd64 -t notes-api:amd64 .
+	docker tag notes-api:amd64 registry.digitalocean.com/notes-api-registry/notes-api:amd64
+	docker push registry.digitalocean.com/notes-api-registry/notes-api:amd64
 
 kind-create:
 	@echo "=========Creating Kind Cluster========="
@@ -47,5 +54,5 @@ apply:
 	cd iac && terraform apply --auto-approve
 
 destroy:
-	cd iac && terraform destroy --auto-approve
+	cd iac && terraform destroy --auto-approve && terraform destroy --auto-approve
 	

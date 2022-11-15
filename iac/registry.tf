@@ -2,6 +2,11 @@ resource "digitalocean_container_registry" "notes-api-registry" {
   name                   = "notes-api-registry"
   subscription_tier_slug = "starter"
   region                 = "ams3"
+
+  provisioner "local-exec" {
+    command     = "doctl registry login && make push"
+    working_dir = "../"
+  }
 }
 
 resource "digitalocean_container_registry_docker_credentials" "notes-api-registry-cred" {
