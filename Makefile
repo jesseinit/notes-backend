@@ -27,10 +27,14 @@ push-locally:
 kind-create:
 	@echo "=========Creating Kind Cluster========="
 	kind create cluster --config k8s/local/cluster.yml
+	@echo "=========Installing Ingress Controller ========="
+	kubectl apply --filename https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+	kubectl wait --namespace ingress-nginx  --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=90s
 	@echo "=========Installing Database Workloads========="
 	kubectl apply -f k8s/local/database.yml
 	@echo "=========Applying Notes API Workloads========="
-	kubectl apply -f k8s/local/notes-api.yml   
+	kubectl apply -f k8s/local/local-notes-api.yml
+	kubectl apply -f k8s/local/local-ingress.yml
 
 kind-destroy:
 	@echo "=========Destroying Kind Cluster========="

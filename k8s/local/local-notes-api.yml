@@ -29,7 +29,7 @@ spec:
       #   - name: notes-api-registry
       containers:
         - name: notes-api
-          image: localhost:5000/notes-api:arm64 # Use this when using a local cluster
+          image: localhost:5000/notes-api # Use this when using a local cluster
           # image: registry.digitalocean.com/notes-api-registry/notes-api:amd64
           imagePullPolicy: Always
           ports:
@@ -52,9 +52,8 @@ metadata:
 spec:
   selector:
     app: note-api
-  type: NodePort
+  type: ClusterIP
   ports:
     - name: note-api-port
-      nodePort: 30000
       port: 8023
       targetPort: 8022

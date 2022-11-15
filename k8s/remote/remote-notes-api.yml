@@ -1,0 +1,58 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: note-api-configmap
+data:
+  # Configuration values can be set as key-value properties
+  DATABASE_HOST: postgres-service.default.svc.cluster.local
+  DATABASE_PORT: '5432'
+  DATABASE_URL: postgresql://postgres:postgres@postgres-service.default.svc.cluster.local/notes_db
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: note-api
+  labels:
+    app: note-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: note-api
+  template:
+    metadata:
+      labels:
+        app: note-api
+    spec:
+      imagePullSecrets:
+        - name: notes-api-registry
+      containers:
+        - name: notes-api
+          image: registry.digitalocean.com/notes-api-registry/notes-api:amd64
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8022
+          envFrom:
+            - configMapRef:
+                name: note-api-configmap
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: '1'
+            requests:
+              memory: 256Mi
+              cpu: '0.2'
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: note-api-service
+spec:
+  selector:
+    app: note-api
+  type: ClusterIP
+  ports:
+    - name: note-api-port
+      port: 8023
+      targetPort: 8022
