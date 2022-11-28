@@ -4,6 +4,7 @@ metadata:
   name: note-api-configmap
 data:
   # Configuration values can be set as key-value properties
+  ENV: production
   DATABASE_HOST: postgres-service.default.svc.cluster.local
   DATABASE_PORT: '5432'
   DATABASE_URL: postgresql://postgres:postgres@postgres-service.default.svc.cluster.local/notes_db

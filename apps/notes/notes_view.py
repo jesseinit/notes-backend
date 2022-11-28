@@ -1,7 +1,9 @@
+import math
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse, Response
+from fastapi_pagination import LimitOffsetPage, Page, Params, paginate
 from pydantic.types import UUID4
 
 from apps.notes import crud
@@ -20,11 +22,18 @@ def create_note(
 
 
 @router.get("")
-def read_all_notes(current_user: JWTBearer = Depends(JWTBearer())):
-    all_notes = crud.get_all_user_notes(current_user)
+def read_all_notes(
+    page_number: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(50, ge=1, le=100, description="Page size"),
+    current_user: JWTBearer = Depends(JWTBearer()),
+):
+    all_notes, all_notes_count_before_offset = crud.get_all_user_notes(
+        current_user, page_number=page_number, page_size=page_size
+    )
     return {
         "msg": "Notes Retrieved",
         "data": [NoteResponse.from_orm(note) for note in all_notes],
+        "meta": {"total_pages": round(all_notes_count_before_offset / page_size)},
     }
 
 

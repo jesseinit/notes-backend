@@ -12,4 +12,12 @@ echo Running Alembic Migrations.
 alembic upgrade head
 
 echo Starting API Server.
-uvicorn main:app --reload --workers $WORKER_COUNT --host 0.0.0.0 --port 8022
+
+if [[ "$ENV" == "production" ]]
+then
+    echo "Starting Production"
+    uvicorn main:app --workers $WORKER_COUNT --host 0.0.0.0 --port 8022
+else
+    echo "Starting Development"
+    uvicorn main:app --reload --host 0.0.0.0 --port 8022
+fi

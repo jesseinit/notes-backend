@@ -4,7 +4,6 @@ services:
   api:
     build: .
     image: notes-api:arm64
-    # image: registry.digitalocean.com/notes-api-registry/notes-api:latest
     container_name: notes-api
     volumes:
       - venv_data:/app/.venv 

@@ -17,14 +17,17 @@ def create_new_note(payload: CreateNoteSchema, owner_id: UUID4) -> NotesModel:
     return new_note
 
 
-def get_all_user_notes(owner) -> List[NotesModel]:
-    all_notes = (
+def get_all_user_notes(
+    owner, page_number: int = 1, page_size: int = 50
+) -> List[NotesModel]:
+    user_notes = (
         session.query(NotesModel)
         .filter_by(owner=owner, deleted_at=None)
         .order_by(NotesModel.created_at.desc())
-        .all()
     )
-    return all_notes
+    total_count = user_notes.count()
+    all_notes = user_notes.limit(page_size).offset(page_number * page_size).all()
+    return all_notes, total_count
 
 
 def get_note_for_delete(note_id: UUID4, owner_id: UUID4) -> Union[None, NotesModel]:

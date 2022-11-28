@@ -5,7 +5,6 @@ resource "helm_release" "notes-api-ingress-nginx" {
   version          = "4.4.0"
   namespace        = "ingress-nginx"
   create_namespace = true
-
 }
 
 resource "helm_release" "notes-api-cert-manager" {

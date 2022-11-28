@@ -8,10 +8,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - notes.jesseinit.dev
+        - notes-api.jesseinit.dev
       secretName: letsencrypt-production
   rules:
-    - host: notes.jesseinit.dev
+    - host: notes-api.jesseinit.dev
       http:
         paths:
           - pathType: Prefix
