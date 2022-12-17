@@ -9,6 +9,7 @@ __pycache__
 *.terraform
 *.hcl
 .venv
+*.log
 
 # Local .terraform directories
 **/.terraform/*

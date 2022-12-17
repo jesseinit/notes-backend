@@ -7,21 +7,23 @@ from pydantic.error_wrappers import ValidationError
 
 load_dotenv()
 
+import logging
+from logging import config as loggin_config
+
 from apps.notes import notes_view as note_app
 from apps.users import users_view as user_app
-from db.session import database
 
 app = FastAPI(title="Notes API")
 
+import yaml
 
-# @app.on_event("startup")
-# async def startup():
-#     await database.connect()
+# https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker/issues/19#issuecomment-1039405731
+with open("logging.yaml") as f:
+    config = yaml.load(f, Loader=yaml.FullLoader)
+    loggin_config.dictConfig(config)
 
-
-# @app.on_event("shutdown")
-# async def shutdown():
-#     await database.disconnect()
+logger = logging.getLogger("CORE")
+logger.info("CORE started!")
 
 
 @app.exception_handler(ValidationError)
@@ -46,6 +48,7 @@ async def unicorn_exception_handler(request: Request, exc: Exception):
 
 @app.get("/", status_code=200, tags=["Home"])
 def index():
+    logger.info("Index Page")
     return {"msg": "The App is Running", "data": None, "host": socket.gethostname()}
 
 
