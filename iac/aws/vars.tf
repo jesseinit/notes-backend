@@ -16,5 +16,5 @@ variable "vpc_name" {
 }
 
 variable "registry_name" {
-  default = "notes-api-registry"
+  default = "notes-api"
 }

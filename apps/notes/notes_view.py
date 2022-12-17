@@ -33,7 +33,7 @@ def read_all_notes(
     return {
         "msg": "Notes Retrieved",
         "data": [NoteResponse.from_orm(note) for note in all_notes],
-        "meta": {"total_pages": round(all_notes_count_before_offset / page_size)},
+        "meta": {"total_notes": all_notes_count_before_offset},
     }
 
 

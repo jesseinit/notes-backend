@@ -17,7 +17,7 @@ metadata:
   labels:
     app: note-api
 spec:
-  replicas: 1
+  replicas: 5
   selector:
     matchLabels:
       app: note-api
@@ -30,7 +30,9 @@ spec:
         - name: notes-api-registry
       containers:
         - name: notes-api
-          image: registry.digitalocean.com/notes-api-registry/notes-api:amd64
+          # image: registry.digitalocean.com/notes-api-registry/notes-api:amd64
+          # image: 450543847015.dkr.ecr.eu-central-1.amazonaws.com/notes-api-registry:latest
+          image: 450543847015.dkr.ecr.eu-central-1.amazonaws.com/notes-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8022
@@ -47,7 +49,7 @@ spec:
               memory: 512Mi
               cpu: '1'
             requests:
-              memory: 256Mi
+              memory: 150Mi
               cpu: '0.2'
 ---
 kind: Service

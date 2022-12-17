@@ -1,3 +1,5 @@
+import socket
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -12,14 +14,14 @@ from db.session import database
 app = FastAPI(title="Notes API")
 
 
-@app.on_event("startup")
-async def startup():
-    await database.connect()
+# @app.on_event("startup")
+# async def startup():
+#     await database.connect()
 
 
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
+# @app.on_event("shutdown")
+# async def shutdown():
+#     await database.disconnect()
 
 
 @app.exception_handler(ValidationError)
@@ -34,13 +36,18 @@ async def validation_handler(request: Request, exc: ValidationError):
 async def unicorn_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
-        content={"msg": f"Oops! {str(exc)}", "data": None},
+        content={
+            "msg": f"Oops! {str(exc)}",
+            "data": None,
+            "host": socket.gethostname(),
+        },
     )
 
 
 @app.get("/", status_code=200, tags=["Home"])
 def index():
-    return {"msg": "The App is Running", "data": None}
+    return {"msg": "The App is Running", "data": None, "host": socket.gethostname()}
+
 
 @app.get("/health", status_code=200, tags=["Home"])
 def health():

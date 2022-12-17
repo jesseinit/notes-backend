@@ -3,6 +3,11 @@ build:
 	docker build -t notes-api:arm64 .
 	docker buildx build --platform linux/amd64 -t notes-api:amd64 .
 
+build-push-ecr:
+	docker buildx build --platform linux/amd64 -t 450543847015.dkr.ecr.eu-central-1.amazonaws.com/notes-api .
+	docker push 450543847015.dkr.ecr.eu-central-1.amazonaws.com/notes-api
+
+
 bootstrap:
 	@echo "=========Bootstraping API========="
 	make build

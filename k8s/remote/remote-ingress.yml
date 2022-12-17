@@ -3,16 +3,15 @@ kind: Ingress
 metadata:
   name: notes-api-ingress
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/load-balancer-name: notes-api-lb
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-central-1:450543847015:certificate/aeafb372-77c2-4130-ba48-72b087123934 # This is the arn of your enabled ACM SSL Cert
 spec:
-  ingressClassName: nginx
-  tls:
-    - hosts:
-        - notes-api.jesseinit.dev
-      secretName: letsencrypt-production
+  # Note that you don't need to set host as setting the certificate-arn will route all traffic to the domain therein
   rules:
-    - host: notes-api.jesseinit.dev
-      http:
+    - http:
         paths:
           - pathType: Prefix
             path: '/'

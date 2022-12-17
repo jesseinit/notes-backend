@@ -11,40 +11,87 @@ module "eks" {
   cluster_endpoint_public_access  = true
 
   eks_managed_node_groups = {
-    one = {
-      name = "node-group-1"
+    lord_group = {
+      name = "lord-pool"
 
-      instance_types = ["t3.medium"]
-
-      min_size     = 1
-      max_size     = 2
-      desired_size = 1
-
-      pre_bootstrap_user_data = <<-EOT
-      echo 'foo bar'
-      EOT
-
-      vpc_security_group_ids = [
-        aws_security_group.node_group_one.id
-      ]
-    }
-
-    two = {
-      name = "node-group-2"
-
-      instance_types = ["t3.medium"]
+      instance_types = ["t3.xlarge"]
 
       min_size     = 1
-      max_size     = 2
+      max_size     = 1
       desired_size = 1
 
-      pre_bootstrap_user_data = <<-EOT
-      echo 'foo bar'
-      EOT
+      pre_bootstrap_user_data = ""
 
       vpc_security_group_ids = [
-        aws_security_group.node_group_two.id
+        aws_security_group.node_sg.id
       ]
+      labels = {
+        "environment"   = "prod"
+        "instance-type" = "t3.xlarge"
+      }
     }
+  }
+}
+
+# Added to allow cluster to be able to provision volumes
+resource "aws_eks_addon" "ebs-csi-driver" {
+  cluster_name  = module.eks.cluster_name
+  addon_name    = "aws-ebs-csi-driver"
+  addon_version = "v1.13.0-eksbuild.3"
+}
+
+resource "aws_security_group" "node_sg" {
+  name_prefix = "workers-sg"
+  description = "Security Group for the Nodes"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "10.0.0.0/8"
+    ]
+  }
+}
+
+
+resource "aws_iam_policy" "load-balancer-policy" {
+  name        = "AWSLoadBalancerControllerIAMPolicy"
+  description = "AWS LoadBalancer Controller IAM Policy"
+  policy      = file("iam-policy.json")
+}
+
+resource "aws_iam_role_policy_attachment" "load-balancer-policy-attachment" {
+  depends_on = [
+    aws_iam_policy.load-balancer-policy
+  ]
+  policy_arn = aws_iam_policy.load-balancer-policy.arn
+  for_each   = module.eks.eks_managed_node_groups
+  role       = each.value["iam_role_name"]
+}
+
+#Allows EC2 Instances to be able to Create EBS Volumes
+resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicyAttachetment" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  for_each   = module.eks.eks_managed_node_groups
+  role       = each.value["iam_role_name"]
+}
+
+
+resource "null_resource" "post-policy" {
+  depends_on = [module.eks]
+  provisioner "local-exec" {
+    on_failure  = fail
+    interpreter = ["/bin/bash", "-c"]
+    when        = create
+    command     = <<EOT
+        aws eks update-kubeconfig --region ${var.region} --name ${var.cluster_name}
+        helm repo add eks https://aws.github.io/eks-charts
+        kubectl apply -f crds.yaml
+        helm install aws-load-balancer-controller eks/aws-load-balancer-controller --set clusterName=${var.cluster_name} -n kube-system
+        echo "Done"
+     EOT
   }
 }
