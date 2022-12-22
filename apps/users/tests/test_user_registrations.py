@@ -35,7 +35,13 @@ def test_register_user__exisiting_user(test_app, monkeypatch):
         "password": "bigmanthing",
     }
 
-    UserFactory(**test_request_payload)
+    # TODO: Fix ME - Test hangs as a result of Session related issues
+    # UserFactory(**test_request_payload)
+
+    test_app.post(
+        app.url_path_for("register_user"),
+        json=test_request_payload,
+    )
 
     response = test_app.post(
         app.url_path_for("register_user"),

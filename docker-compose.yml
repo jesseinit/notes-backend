@@ -5,14 +5,13 @@ services:
     build: .
     image: notes-api:arm64
     container_name: notes-api
-    cpus: 0.3
     volumes:
-      - venv_data:/app/.venv 
+      - venv:/app/.venv
       - .:/app
     ports:
       - 8023:8022
     environment:
-      - ENV=production
+      # - ENV=production
       - DATABASE_HOST=db-pool
       - DATABASE_PORT=5499
       - DATABASE_URL=postgresql://postgres:postgres@db-pool:5499/notes_db
@@ -44,4 +43,4 @@ services:
       - "5432:5499"
 volumes:
   postgres_data:
-  venv_data:
+  venv:

@@ -1,4 +1,5 @@
 import socket
+from helpers.logger import logger
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
@@ -7,23 +8,11 @@ from pydantic.error_wrappers import ValidationError
 
 load_dotenv()
 
-import logging
-from logging import config as loggin_config
 
 from apps.notes import notes_view as note_app
 from apps.users import users_view as user_app
 
 app = FastAPI(title="Notes API")
-
-import yaml
-
-# https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker/issues/19#issuecomment-1039405731
-with open("logging.yaml") as f:
-    config = yaml.load(f, Loader=yaml.FullLoader)
-    loggin_config.dictConfig(config)
-
-logger = logging.getLogger("CORE")
-logger.info("CORE started!")
 
 
 @app.exception_handler(ValidationError)

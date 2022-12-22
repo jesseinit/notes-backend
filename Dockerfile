@@ -1,4 +1,4 @@
-FROM python:3.9.10-slim as build
+FROM python:3.10.0-slim as build
 
 RUN apt-get update \
 	&& apt-get install libffi-dev netcat \
@@ -32,13 +32,16 @@ ENV PATH="$POETRY_HOME/bin:$APP_HOME/.venv/bin:$PATH"
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
 RUN curl -sSL https://install.python-poetry.org | python
 
-COPY poetry.lock pyproject.toml ./
+# COPY poetry.lock pyproject.toml ./
+COPY pyproject.toml ./
 
 RUN poetry install --no-root
 
 COPY . .
 
-FROM python:3.9.10-slim
+# ================================ Main Build ================================
+
+FROM python:3.10.0-slim
 
 RUN apt-get update && apt-get install -y netcat && apt-get clean
 

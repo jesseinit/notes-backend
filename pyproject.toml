@@ -70,3 +70,6 @@ build-backend = "poetry.core.masonry.api"
 env = [
     "TESTING=True",
 ]
+
+[tool.black]
+line-length = 100

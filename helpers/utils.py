@@ -3,11 +3,11 @@ from typing import Dict, Union
 
 import jwt
 from decouple import config
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from passlib.context import CryptContext
-from passlib.hash import bcrypt
 
+from passlib.hash import bcrypt
+from db.session import get_db, SessionLocal as Session
 from apps.users import crud as UserDAL
 
 JWT_SECRET = config("JWT_SECRET", default="gt74dg*&@%#Y#$)#@#$ssjdhgshdgf", cast=str)
@@ -48,7 +48,7 @@ class JWTBearer(HTTPBearer):
     def __init__(self, auto_error: bool = True):
         super().__init__(auto_error=auto_error)
 
-    async def __call__(self, request: Request):
+    async def __call__(self, request: Request, session: Session = Depends(get_db)):
         credentials: HTTPAuthorizationCredentials = await super().__call__(request)
         if credentials:
             if not credentials.scheme == "Bearer":
@@ -60,7 +60,9 @@ class JWTBearer(HTTPBearer):
                 raise HTTPException(
                     status_code=403, detail="Invalid token or expired token."
                 )
-            user = UserDAL.get_user_by_username(username=auth_payload.get("username"))
+            user = UserDAL.get_user_by_username(
+                username=auth_payload.get("username"), session=session
+            )
             if not user:
                 raise HTTPException(
                     status_code=403, detail="Invalid token or expired token."

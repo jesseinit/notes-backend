@@ -1,5 +1,9 @@
 import factory
-from db.session import session
+
+from db.session import SessionLocal, get_db, DATABASE_URL, create_engine
+from sqlalchemy import orm
+
+Session = orm.scoped_session(orm.sessionmaker(bind=create_engine(DATABASE_URL)))
 
 
 class BaseSQLAlchemyModelFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -7,5 +11,5 @@ class BaseSQLAlchemyModelFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     class Meta:
         abstract = True  # Cannot initialize
-        sqlalchemy_session = session
+        sqlalchemy_session = Session()
         sqlalchemy_session_persistence = "flush"

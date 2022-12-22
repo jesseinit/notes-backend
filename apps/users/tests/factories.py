@@ -1,6 +1,7 @@
 import factory
 from faker import Faker
 
+
 import base_tests_factory as base_factory
 from apps.users.models import Users
 
@@ -9,7 +10,7 @@ class UserFactory(base_factory.BaseSQLAlchemyModelFactory):
     class Meta:
         model = Users
 
-    id = factory.LazyFunction(lambda: Faker().uuid4())
+    id = factory.Sequence(lambda n: n)
     username = factory.LazyFunction(lambda: Faker().user_name())
     first_name = factory.LazyFunction(lambda: Faker().first_name())
     last_name = factory.LazyFunction(lambda: Faker().first_name())
