@@ -5,37 +5,43 @@ services:
     build: .
     image: notes-api:arm64
     container_name: notes-api
+    cpus: 0.3
     volumes:
       - venv_data:/app/.venv 
       - .:/app
     ports:
       - 8023:8022
     environment:
-      - DATABASE_HOST=notes-db
-      - DATABASE_PORT=5432
-      - DATABASE_URL=postgresql://postgres:postgres@db/notes_db
+      - ENV=production
+      - DATABASE_HOST=db-pool
+      - DATABASE_PORT=5499
+      - DATABASE_URL=postgresql://postgres:postgres@db-pool:5499/notes_db
       - DATABASE_URL_TEST=postgresql://postgres:postgres@db/notes_db_test
-    # These lines has been added to enable the use of breakpoints in debugging
-    stdin_open: true
-    tty: true
 
   db:
     image: postgres:12
     container_name: notes-db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    ports:
-      - "5435:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=notes_db
-    entrypoint:
-      - docker-entrypoint.sh
-      - -c
-      - log_statement=all
-      - -c
-      - log_destination=stderr
+  
+  pgbouncer:
+    container_name: db-pool
+    image: edoburu/pgbouncer
+    environment:
+       - DB_USER=postgres
+       - DB_PASSWORD=postgres
+       - DB_HOST=db
+       - DB_NAME=notes_db
+       - POOL_MODE=transaction
+       - ADMIN_USERS=postgres
+       - LISTEN_PORT=5499
+       - VERBOSE=1
+    ports:
+      - "5432:5499"
 volumes:
   postgres_data:
   venv_data:

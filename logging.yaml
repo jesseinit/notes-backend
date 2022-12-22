@@ -1,7 +1,7 @@
 version: 1
 formatters:
   simple:
-    format: '%(asctime)s %(levelname)-8s %(name)-15s %(message)s'
+    format: '%(asctime)s - %(levelname)-4s - %(process)d - %(name)-15s : %(message)s'
 handlers:
   console:
     class: logging.StreamHandler
@@ -23,5 +23,6 @@ loggers:
       propagate: true
 root:
   level: DEBUG
-  handlers: [console, file]
+  # handlers: [console, file]
+  handlers: [console]
   propagate: no

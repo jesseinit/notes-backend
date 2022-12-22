@@ -1,15 +1,12 @@
 #!/bin/bash
 
-WORKER_COUNT=$(nproc)
+let WORKER_COUNT=2*$(nproc)+1
 
-while !</dev/tcp/${DATABASE_HOST}/${DATABASE_PORT}; do 
+while ! nc -z $DATABASE_HOST $DATABASE_PORT; do 
     echo "Waiting for postgress listening..."
     sleep 0.1; 
 done;
-echo "PostgreSQL started"
-
-echo Running Alembic Migrations.
-alembic upgrade head
+echo "Database Up"
 
 echo Starting API Server.
 

@@ -18,7 +18,7 @@ class CreateNoteSchema(BaseModel):
 
 
 class NoteResponse(BaseModel):
-    id: UUID4
+    id: int
     title: str
     description: str
     status: Union[None, NoteStatus]

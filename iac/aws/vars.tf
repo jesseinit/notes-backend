@@ -3,6 +3,11 @@ variable "region" {
   description = "Where to deploy the resources"
 }
 
+variable "profile" {
+  default     = "default" #or init-1
+  description = "AWS Credentials profile to be used"
+}
+
 variable "cluster_name" {
   default = "notes-api-cluster"
 }
@@ -17,4 +22,8 @@ variable "vpc_name" {
 
 variable "registry_name" {
   default = "notes-api"
+}
+
+variable "node_desired_size" {
+  default = 3
 }

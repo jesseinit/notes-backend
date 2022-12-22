@@ -38,7 +38,7 @@ def read_all_notes(
 
 
 @router.get("/{id}")
-def read_note(id: UUID4, current_user: JWTBearer = Depends(JWTBearer())):
+def read_note(id: int, current_user: JWTBearer = Depends(JWTBearer())):
     note = crud.get_note(note_id=id, owner_id=current_user.id)
     if not note:
         return JSONResponse(

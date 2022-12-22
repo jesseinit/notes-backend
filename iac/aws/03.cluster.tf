@@ -10,15 +10,23 @@ module "eks" {
   cluster_endpoint_private_access = false
   cluster_endpoint_public_access  = true
 
+  tags = {
+    "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned",
+    "k8s.io/cluster-autoscaler/enabled"             = true
+  }
+
+  # # Required for Karpenter role below
+  # enable_irsa = true
+
   eks_managed_node_groups = {
     lord_group = {
       name = "lord-pool"
 
-      instance_types = ["t3.xlarge"]
+      instance_types = ["t3.medium"]
 
-      min_size     = 1
-      max_size     = 1
-      desired_size = 1
+      min_size     = 3
+      max_size     = 5
+      desired_size = 3
 
       pre_bootstrap_user_data = ""
 
@@ -27,7 +35,7 @@ module "eks" {
       ]
       labels = {
         "environment"   = "prod"
-        "instance-type" = "t3.xlarge"
+        "instance-type" = "t3.medium"
       }
     }
   }
@@ -56,11 +64,30 @@ resource "aws_security_group" "node_sg" {
   }
 }
 
+# resource "null_resource" "load-balancer-policy-doc" {
+#   # Download the permission file to enable LB provisioning
+#   provisioner "local-exec" {
+#     when    = create
+#     command = "curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json"
+#   }
+#   provisioner "local-exec" {
+#     when    = delete
+#     command = "curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json"
+#   }
+# }
+
+data "http" "aws-lb-controller-policy" {
+  url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.4.0/docs/install/iam_policy.json"
+
+  request_headers = {
+    Accept = "application/json"
+  }
+}
 
 resource "aws_iam_policy" "load-balancer-policy" {
   name        = "AWSLoadBalancerControllerIAMPolicy"
   description = "AWS LoadBalancer Controller IAM Policy"
-  policy      = file("iam-policy.json")
+  policy      = data.http.aws-lb-controller-policy.response_body
 }
 
 resource "aws_iam_role_policy_attachment" "load-balancer-policy-attachment" {
@@ -89,9 +116,12 @@ resource "null_resource" "post-policy" {
     command     = <<EOT
         aws eks update-kubeconfig --region ${var.region} --name ${var.cluster_name}
         helm repo add eks https://aws.github.io/eks-charts
-        kubectl apply -f crds.yaml
+        kubectl apply -f https://raw.githubusercontent.com/aws/eks-charts/master/stable/aws-load-balancer-controller/crds/crds.yaml
         helm install aws-load-balancer-controller eks/aws-load-balancer-controller --set clusterName=${var.cluster_name} -n kube-system
         echo "Done"
      EOT
   }
 }
+
+# Connect LB DNS to Domain CNAME Record
+# curl -X POST "https://api.namecheap.com/xml.response?ApiUser=USERNAME&ApiKey=API_KEY&UserName=USERNAME&Command=namecheap.domains.dns.setHosts&ClientIp=CLIENT_IP&SLD=jesseinit&TLD=dev&HostName=www&RecordType=CNAME&Address=jesseinit.dev"

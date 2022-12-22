@@ -1,15 +1,3 @@
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: note-api-configmap
-data:
-  # Configuration values can be set as key-value properties
-  ENV: production
-  DATABASE_HOST: postgres-service.default.svc.cluster.local
-  DATABASE_PORT: '5432'
-  DATABASE_URL: postgresql://postgres:postgres@postgres-service.default.svc.cluster.local/notes_db
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,7 +5,7 @@ metadata:
   labels:
     app: note-api
 spec:
-  replicas: 5
+  replicas: 3
   selector:
     matchLabels:
       app: note-api
@@ -26,19 +14,18 @@ spec:
       labels:
         app: note-api
     spec:
-      imagePullSecrets:
-        - name: notes-api-registry
       containers:
         - name: notes-api
-          # image: registry.digitalocean.com/notes-api-registry/notes-api:amd64
-          # image: 450543847015.dkr.ecr.eu-central-1.amazonaws.com/notes-api-registry:latest
           image: 450543847015.dkr.ecr.eu-central-1.amazonaws.com/notes-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8022
+          env:
+            - name: ENV
+              value: 'production'
           envFrom:
-            - configMapRef:
-                name: note-api-configmap
+            - secretRef:
+                name: rds-credentials
           readinessProbe:
             httpGet:
               path: /health

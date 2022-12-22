@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, Text
+from sqlalchemy import Column, ForeignKey, Integer, Sequence, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import ChoiceType
@@ -22,7 +22,7 @@ class Notes(Base):
         default=NOTESTATE[1][0],
         nullable=False,
     )
-    owner_id = Column(UUID, ForeignKey("users.id"))
+    owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("Users", back_populates="notes")
 
     def __str__(self) -> str:

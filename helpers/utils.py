@@ -6,6 +6,7 @@ from decouple import config
 from fastapi import HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
+from passlib.hash import bcrypt
 
 from apps.users import crud as UserDAL
 
@@ -17,13 +18,11 @@ JWT_EXP = config("JWT_EXP", default=3, cast=int)
 class HashManager:
     @staticmethod
     def hash_password(pwd: str) -> str:
-        return CryptContext(schemes=["bcrypt"], deprecated="auto").hash(pwd)
+        return bcrypt.hash(pwd)
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
-        return CryptContext(schemes=["bcrypt"], deprecated="auto").verify(
-            plain_password, hashed_password
-        )
+        return bcrypt.verify(plain_password, hashed_password)
 
     @staticmethod
     def encode_data(data_to_encode: Dict) -> str:

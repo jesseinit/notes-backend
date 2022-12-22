@@ -10,6 +10,7 @@ __pycache__
 *.hcl
 .venv
 *.log
+load-testing/
 
 # Local .terraform directories
 **/.terraform/*

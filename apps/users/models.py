@@ -24,7 +24,7 @@ class Users(Base):
         nullable=False,
     )
     is_verified = Column(Boolean, default=True)
-    notes = relationship("Notes", backref="notes")
+    notes = relationship("Notes", back_populates="owner")
 
     def __str__(self) -> str:
         return f"<Users username={self.username}>"

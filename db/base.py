@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from sqlalchemy import Column, DateTime, MetaData
+from sqlalchemy import Column, DateTime, Integer, MetaData
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy.sql import func
@@ -21,9 +21,8 @@ metadata = MetaData(naming_convention=convention)
 
 @as_declarative(metadata=metadata)
 class Base:
-    id = Column(
-        UUID(as_uuid=True), primary_key=True, index=True, default=lambda: uuid4()
-    )
+    # id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=lambda: uuid4())
+    id = Column(Integer, primary_key=True)
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
