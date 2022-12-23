@@ -32,8 +32,7 @@ ENV PATH="$POETRY_HOME/bin:$APP_HOME/.venv/bin:$PATH"
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
 RUN curl -sSL https://install.python-poetry.org | python
 
-# COPY poetry.lock pyproject.toml ./
-COPY pyproject.toml ./
+COPY poetry.lock pyproject.toml ./
 
 RUN poetry install --no-root
 
