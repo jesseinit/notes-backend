@@ -3,7 +3,7 @@ version: '3.9'
 services:
   api:
     build: .
-    image: notes-api:arm64
+    image: notes-api
     container_name: notes-api
     volumes:
       - venv:/app/.venv
@@ -11,14 +11,14 @@ services:
     ports:
       - 8023:8022
     environment:
-      - ENV=app-runner
+      # - ENV=app-runner
       - DATABASE_HOST=db-pool
       - DATABASE_PORT=5499
       - DATABASE_URL=postgresql://postgres:postgres@db-pool:5499/notes_db
-      - DATABASE_URL_TEST=postgresql://postgres:postgres@db/notes_db_test
+      - DATABASE_URL_TEST=postgresql://postgres:postgres@db-pool:5499/notes_db_test
 
   db:
-    image: postgres:12
+    image: postgres:14
     container_name: notes-db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -27,18 +27,21 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=notes_db
   
+  # psql postgres://postgres:postgres@127.0.0.1:5499/pgbouncer
   pgbouncer:
     container_name: db-pool
     image: edoburu/pgbouncer
     environment:
        - DB_USER=postgres
        - DB_PASSWORD=postgres
-       - DB_HOST=db
+       - DB_HOST=notes-db
        - DB_NAME=notes_db
-       - POOL_MODE=transaction
+       - POOL_MODE=session
        - ADMIN_USERS=postgres
        - LISTEN_PORT=5499
        - VERBOSE=1
+       - DEFAULT_POOL_SIZE=300
+       - MAX_CLIENT_CONN=1000
     ports:
       - "5432:5499"
 volumes:

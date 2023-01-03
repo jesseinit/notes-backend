@@ -1,7 +1,7 @@
 build:
 	@echo "=========Building API Image========="
-	docker build -t notes-api:arm64 .
-	# docker buildx build --platform linux/amd64 -t notes-api:amd64 .
+	docker build -t notes-api .
+	# docker buildx build --platform linux/amd64 -t notes-api .
 
 build-push-ecr:
 	docker buildx build --platform linux/amd64 -t 450543847015.dkr.ecr.eu-central-1.amazonaws.com/notes-api .

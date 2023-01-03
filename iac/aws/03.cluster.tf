@@ -122,6 +122,3 @@ resource "null_resource" "post-policy" {
      EOT
   }
 }
-
-# Connect LB DNS to Domain CNAME Record
-# curl -X POST "https://api.namecheap.com/xml.response?ApiUser=USERNAME&ApiKey=API_KEY&UserName=USERNAME&Command=namecheap.domains.dns.setHosts&ClientIp=CLIENT_IP&SLD=jesseinit&TLD=dev&HostName=www&RecordType=CNAME&Address=jesseinit.dev"

@@ -10,7 +10,6 @@ packages = [{include = "notes_backend"}]
 python = "^3.9"
 alembic = "^1.5.8"
 appdirs = "^1.4.4"
-asyncpg = "^0.22.0"
 attrs = "^20.3.0"
 black = "^21.4b2"
 certifi = "^2020.12.5"
@@ -33,7 +32,6 @@ packaging = "^20.9"
 pathspec = "^0.8.1"
 pluggy = "^0.13.1"
 pre-commit = "^2.12.1"
-psycopg2-binary = "^2.9.5"
 py = "^1.10.0"
 pydantic = {extras = ["email"], version = "^1.10.2"}
 pyparsing = "^2.4.7"
@@ -61,6 +59,7 @@ python-decouple = "^3.6"
 fastapi-pagination = "^0.10.0"
 httpx = "^0.23.1"
 bcrypt = "^4.0.1"
+psycopg2 = "^2.9.5"
 
 [build-system]
 requires = ["poetry-core"]

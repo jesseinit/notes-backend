@@ -1,7 +1,7 @@
 FROM python:3.10.0-slim as build
 
 RUN apt-get update \
-	&& apt-get install libffi-dev netcat \
+	&& apt-get install libffi-dev \
 	gcc python3-dev libpq-dev curl build-essential -y \
 	&& apt-get clean
 
@@ -55,7 +55,7 @@ ENV VENV_DIR="${APP_HOME}/.venv"
 
 # Copy the app directory(source code and venv folders)
 COPY --from=build $APP_HOME $APP_HOME
-# Copy peotry too just incase we need the cli
+# # Copy peotry too just incase we need the cli
 COPY --from=build $POETRY_HOME $POETRY_HOME
 
 # Update path with poetry and venv cli apps
