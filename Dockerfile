@@ -53,12 +53,9 @@ WORKDIR $APP_HOME
 ENV POETRY_HOME="/opt/poetry"
 ENV VENV_DIR="${APP_HOME}/.venv"
 
-# Copy the app directory(source code and venv folders)
 COPY --from=build $APP_HOME $APP_HOME
-# # Copy peotry too just incase we need the cli
 COPY --from=build $POETRY_HOME $POETRY_HOME
 
-# Update path with poetry and venv cli apps
 ENV PATH="$POETRY_HOME/bin:$VENV_DIR/bin:$PATH"
 
 RUN chmod +x api.sh

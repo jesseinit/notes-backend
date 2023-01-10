@@ -19,16 +19,19 @@ module "eks" {
   # enable_irsa = true
 
   eks_managed_node_groups = {
-    lord_group = {
-      name = "lord-pool"
+    base_workers = {
+      name = "base_workers"
 
       instance_types = ["t3.medium"]
 
-      min_size     = 3
-      max_size     = 5
-      desired_size = 3
+      min_size     = 2
+      max_size     = 4
+      desired_size = 2
 
-      pre_bootstrap_user_data = ""
+      pre_bootstrap_user_data = <<-EOT
+        #!/bin/bash
+        echo "Hello Fucking Werld"
+      EOT
 
       vpc_security_group_ids = [
         aws_security_group.node_sg.id
@@ -63,18 +66,6 @@ resource "aws_security_group" "node_sg" {
     ]
   }
 }
-
-# resource "null_resource" "load-balancer-policy-doc" {
-#   # Download the permission file to enable LB provisioning
-#   provisioner "local-exec" {
-#     when    = create
-#     command = "curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json"
-#   }
-#   provisioner "local-exec" {
-#     when    = delete
-#     command = "curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json"
-#   }
-# }
 
 data "http" "aws-lb-controller-policy" {
   url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.4.0/docs/install/iam_policy.json"
@@ -114,7 +105,7 @@ resource "null_resource" "post-policy" {
     interpreter = ["/bin/bash", "-c"]
     when        = create
     command     = <<EOT
-        aws eks update-kubeconfig --region ${var.region} --name ${var.cluster_name}
+        aws eks update-kubeconfig --region ${var.region} --profile ${var.profile} --name ${var.cluster_name}
         helm repo add eks https://aws.github.io/eks-charts
         kubectl apply -f https://raw.githubusercontent.com/aws/eks-charts/master/stable/aws-load-balancer-controller/crds/crds.yaml
         helm install aws-load-balancer-controller eks/aws-load-balancer-controller --set clusterName=${var.cluster_name} -n kube-system

@@ -1,5 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, Sequence, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import ChoiceType
 
