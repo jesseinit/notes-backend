@@ -25,7 +25,7 @@ variable "registry_name" {
 }
 
 variable "node_desired_size" {
-  default = 3
+  default = 2
 }
 
 variable "rds_database" {

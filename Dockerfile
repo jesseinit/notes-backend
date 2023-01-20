@@ -58,6 +58,7 @@ COPY --from=build $POETRY_HOME $POETRY_HOME
 
 ENV PATH="$POETRY_HOME/bin:$VENV_DIR/bin:$PATH"
 
-RUN chmod +x api.sh
+RUN chmod +x ./k8s/scripts/api.sh
+RUN chmod +x ./k8s/scripts/migrate-db.sh
 
-CMD ["./api.sh"]
+CMD ["./k8s/scripts/api.sh"]

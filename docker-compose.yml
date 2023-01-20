@@ -5,6 +5,7 @@ services:
     build: .
     image: notes-api
     container_name: notes-api
+    entrypoint: ["bash","-c","./k8s/scripts/migrate-db.sh && ./k8s/scripts/api.sh"]
     volumes:
       - venv:/app/.venv
       - .:/app
@@ -18,7 +19,7 @@ services:
       - DATABASE_URL_TEST=postgresql://postgres:postgres@db-pool:5499/notes_db_test
 
   db:
-    image: postgres:14
+    image: postgres:12
     container_name: notes-db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -41,7 +42,7 @@ services:
        - LISTEN_PORT=5499
        - VERBOSE=1
        - DEFAULT_POOL_SIZE=300
-       - MAX_CLIENT_CONN=1000
+       - MAX_CLIENT_CONN=10000
     ports:
       - "5432:5499"
 volumes:

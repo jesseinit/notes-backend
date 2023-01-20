@@ -2,14 +2,7 @@
 
 let WORKER_COUNT=2*$(nproc)+1
 
-while ! nc -z $DATABASE_HOST $DATABASE_PORT; do 
-    echo "Waiting for postgress listening..."
-    sleep 0.1; 
-done;
-echo "Database Up"
-
-echo Starting API Server.
-
+echo "Starting API Server."
 
 if [[ "$ENV" == "production" ]]
 then

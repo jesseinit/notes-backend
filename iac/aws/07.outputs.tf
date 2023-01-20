@@ -8,11 +8,6 @@ output "cluster_endpoint" {
   value       = module.eks.cluster_endpoint
 }
 
-output "cluster_security_group_id" {
-  description = "Security group ids attached to the cluster control plane"
-  value       = module.eks.cluster_security_group_id
-}
-
 output "region" {
   description = "AWS region"
   value       = var.region
@@ -23,7 +18,7 @@ output "cluster_name" {
   value       = var.cluster_name
 }
 
-output "eks_managed_node_groups" {
-  description = "Node Group Details"
-  value       = module.eks.eks_managed_node_groups
+output "ecr-repository" {
+  description = "ECR Repository URL"
+  value       = aws_ecr_repository.ecr.repository_url
 }

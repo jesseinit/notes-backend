@@ -1,0 +1,23 @@
+configMapGenerator:
+  - name: db-config
+    literals:
+      - DATABASE_HOST=pgbouncer-service.default.svc.cluster.local
+      - DATABASE_PORT=5432
+      - DATABASE_URL=postgresql://bigman2023:bigman2023@pgbouncer-service.default.svc.cluster.local/notes_db
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    type: generated
+  annotations:
+    note: generated
+
+resources:
+  - 01.jobs.yaml
+  - 02.db-pooler.yaml
+  - 03.api.yaml
+  - 04.ingress.yaml
+
+images:
+  - name: notes-api
+    newName: 866389174338.dkr.ecr.eu-central-1.amazonaws.com/notes-registry
+    newTag: latest

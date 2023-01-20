@@ -7,8 +7,8 @@ resource "aws_db_instance" "rds" {
   allocated_storage = var.rds_database["allocated_storage"]
   engine_version    = var.rds_database["engine_version"]
 
-  vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.rds_sng.name
+  vpc_security_group_ids = [aws_security_group.rds_admin_sg.id, aws_security_group.node_sg.id]
+  db_subnet_group_name   = module.vpc.database_subnet_group_name
 
   # Replace with your desired username and password
   username = var.rds_database["rds_user"]
@@ -18,38 +18,33 @@ resource "aws_db_instance" "rds" {
   db_name = var.rds_database["db_name"]
 
   skip_final_snapshot = true
+  publicly_accessible = true
+  identifier          = "notes-db"
 }
 
-resource "aws_subnet" "rds_subnets_1" {
-  vpc_id            = module.vpc.vpc_id
-  cidr_block        = "10.0.7.0/24"
-  availability_zone = data.aws_availability_zones.available.names[0]
-}
-
-resource "aws_subnet" "rds_subnets_2" {
-  vpc_id            = module.vpc.vpc_id
-  cidr_block        = "10.0.8.0/24"
-  availability_zone = data.aws_availability_zones.available.names[2]
-}
-
-resource "aws_db_subnet_group" "rds_sng" {
-  name       = "rds-subnet"
-  subnet_ids = [aws_subnet.rds_subnets_1.id, aws_subnet.rds_subnets_2.id]
-}
-
-resource "aws_security_group" "rds_sg" {
-  name   = "notes-db-sg"
+resource "aws_security_group" "rds_admin_sg" {
+  name   = "notes-db-admin-sg"
   vpc_id = module.vpc.vpc_id
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    description = "SG Rule to allow Admin"
+    cidr_blocks = [
+      "${chomp(data.http.my_ip.response_body)}/32",
+    ]
+  }
+  egress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
+  }
 }
 
-resource "aws_security_group_rule" "rds_allow_k8s_nodes" {
-  type                     = "ingress"
-  from_port                = 5432
-  to_port                  = 5432
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.rds_sg.id
-  source_security_group_id = aws_security_group.node_sg.id
-}
 
 resource "kubernetes_secret" "rds" {
   metadata {
@@ -59,6 +54,8 @@ resource "kubernetes_secret" "rds" {
   data = {
     DATABASE_HOST : aws_db_instance.rds.address
     DATABASE_PORT : aws_db_instance.rds.port
+    DATABASE_PASSWORD : aws_db_instance.rds.password
+    DATABASE_USERNAME : aws_db_instance.rds.username
     DATABASE_URL : "postgresql://${aws_db_instance.rds.username}:${aws_db_instance.rds.password}@${aws_db_instance.rds.endpoint}/${aws_db_instance.rds.db_name}"
   }
 }

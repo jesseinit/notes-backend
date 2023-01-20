@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: pgbouncer
+  name: pgbouncer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgbouncer
+  template:
+    metadata:
+      labels:
+        app: pgbouncer
+    spec:
+      containers:
+        - env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: DATABASE_URL
+                  name: rds-credentials
+            - name: POOL_MODE
+              value: transaction
+            - name: DEFAULT_POOL_SIZE
+              value: '75'
+            # - name: MAX_CLIENT_CONN
+            #   value: '10000'
+            - name: VERBOSE
+              value: '2'
+            - name: ADMIN_USERS
+              value: postgres
+            - name: SERVER_RESET_QUERY
+              value: DISCARD ALL
+          name: pgbouncer
+          image: edoburu/pgbouncer:1.18.0
+          ports:
+            - containerPort: 5432
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - killall -INT pgbouncer && sleep 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - all
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: '0.7'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgbouncer-service
+spec:
+  ports:
+    - port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    app: pgbouncer
+  type: ClusterIP

@@ -10,29 +10,45 @@ module "eks" {
   cluster_endpoint_private_access = false
   cluster_endpoint_public_access  = true
 
-  tags = {
-    "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned",
-    "k8s.io/cluster-autoscaler/enabled"             = true
+  # Required for Karpenter role below
+  enable_irsa = true
+
+  node_security_group_tags = {
+    # NOTE - if creating multiple security groups with this module, only tag the
+    # security group that Karpenter should utilize with the following tag
+    # (i.e. - at most, only one security group should have this tag in your account)
+    "karpenter.sh/discovery" = var.cluster_name
   }
 
-  # # Required for Karpenter role below
-  # enable_irsa = true
+  node_security_group_additional_rules = {
+
+    # Helm Install Metrics Server for this to have effect.
+    ingress_cluster_metricserver = {
+      description                   = "Cluster to node 4443 (Metrics Server)"
+      protocol                      = "tcp"
+      from_port                     = 4443
+      to_port                       = 4443
+      type                          = "ingress"
+      source_cluster_security_group = true
+    }
+  }
 
   eks_managed_node_groups = {
-    base_workers = {
-      name = "base_workers"
+    initial = {
+      name = "initial-workers"
 
       instance_types = ["t3.medium"]
 
-      min_size     = 2
-      max_size     = 4
-      desired_size = 2
+      min_size     = 1
+      max_size     = 5
+      desired_size = var.node_desired_size
 
       pre_bootstrap_user_data = <<-EOT
         #!/bin/bash
         echo "Hello Fucking Werld"
       EOT
 
+      create_security_group = false
       vpc_security_group_ids = [
         aws_security_group.node_sg.id
       ]
@@ -42,13 +58,6 @@ module "eks" {
       }
     }
   }
-}
-
-# Added to allow cluster to be able to provision volumes
-resource "aws_eks_addon" "ebs-csi-driver" {
-  cluster_name  = module.eks.cluster_name
-  addon_name    = "aws-ebs-csi-driver"
-  addon_version = "v1.13.0-eksbuild.3"
 }
 
 resource "aws_security_group" "node_sg" {
@@ -65,13 +74,20 @@ resource "aws_security_group" "node_sg" {
       "10.0.0.0/8"
     ]
   }
-}
 
-data "http" "aws-lb-controller-policy" {
-  url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.4.0/docs/install/iam_policy.json"
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    description = "SG Rule for RDS Access"
 
-  request_headers = {
-    Accept = "application/json"
+    cidr_blocks = [
+      "10.0.0.0/8"
+    ]
+  }
+
+  tags = {
+    "karpenter.sh/discovery" = var.cluster_name
   }
 }
 
@@ -90,15 +106,24 @@ resource "aws_iam_role_policy_attachment" "load-balancer-policy-attachment" {
   role       = each.value["iam_role_name"]
 }
 
-#Allows EC2 Instances to be able to Create EBS Volumes
-resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicyAttachetment" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-  for_each   = module.eks.eks_managed_node_groups
-  role       = each.value["iam_role_name"]
+
+resource "helm_release" "aws_loadbalancer_controller" {
+  depends_on       = [module.eks]
+  namespace        = "kube-system"
+  create_namespace = true
+
+  name       = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  version    = "1.4.6"
+
+  set {
+    name  = "clusterName"
+    value = module.eks.cluster_name
+  }
 }
 
-
-resource "null_resource" "post-policy" {
+resource "null_resource" "alb_controller_crds" {
   depends_on = [module.eks]
   provisioner "local-exec" {
     on_failure  = fail
@@ -106,10 +131,25 @@ resource "null_resource" "post-policy" {
     when        = create
     command     = <<EOT
         aws eks update-kubeconfig --region ${var.region} --profile ${var.profile} --name ${var.cluster_name}
-        helm repo add eks https://aws.github.io/eks-charts
         kubectl apply -f https://raw.githubusercontent.com/aws/eks-charts/master/stable/aws-load-balancer-controller/crds/crds.yaml
-        helm install aws-load-balancer-controller eks/aws-load-balancer-controller --set clusterName=${var.cluster_name} -n kube-system
-        echo "Done"
+        echo "Applied ALB Controller Custom Resource Controllers"
      EOT
   }
 }
+
+resource "null_resource" "pre_cluster_deletion" {
+  depends_on = [module.eks]
+  provisioner "local-exec" {
+    on_failure  = fail
+    interpreter = ["/bin/bash", "-c"]
+    when        = destroy
+    command     = <<EOT
+        aws eks update-kubeconfig --region eu-central-1 --profile dev01 --name notes-cluster
+        kubectl delete -k ../../k8s/remote
+        helm uninstall aws-load-balancer-controller
+        echo "Uninstalled AWS Loadbalancer Controller"
+     EOT
+  }
+}
+
+

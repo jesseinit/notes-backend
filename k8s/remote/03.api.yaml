@@ -5,7 +5,7 @@ metadata:
   labels:
     app: note-api
 spec:
-  replicas: 3
+  replicas: 5
   selector:
     matchLabels:
       app: note-api
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: notes-api
-          image: 866389174338.dkr.ecr.eu-central-1.amazonaws.com/notes-registry:latest
+          image: notes-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8022
@@ -24,19 +24,25 @@ spec:
             - name: ENV
               value: 'production'
           envFrom:
-            - secretRef:
-                name: rds-credentials
+            - configMapRef:
+                name: db-config
           readinessProbe:
             httpGet:
               path: /health
               port: 8022
             initialDelaySeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8022
+            initialDelaySeconds: 20
+            periodSeconds: 10
           resources:
             limits:
-              memory: 512Mi
-              cpu: '1'
+              memory: 600Mi
+              cpu: '0.5'
             requests:
-              memory: 150Mi
+              memory: 512Mi
               cpu: '0.2'
 ---
 kind: Service
@@ -51,3 +57,18 @@ spec:
     - name: note-api-port
       port: 8023
       targetPort: 8022
+---
+# TODO: Still figuring out how to calculate pod resource params to better understand how HPA ties into horizontal scalling. Phewww
+# apiVersion: autoscaling/v1
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: notes-api
+#   namespace: default
+# spec:
+#   scaleTargetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: notes-api
+#   minReplicas: 5
+#   maxReplicas: 20
+#   targetCPUUtilizationPercentage: 50
