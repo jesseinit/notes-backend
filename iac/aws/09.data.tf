@@ -8,7 +8,7 @@ data "aws_ecrpublic_authorization_token" "token" {
 }
 
 data "http" "my_ip" {
-  url = "https://icanhazip.com"
+  url = "https://ifconfig.me/ip"
 }
 
 data "http" "aws-lb-controller-policy" {

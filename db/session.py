@@ -15,12 +15,12 @@ else:
 engine = create_engine(
     DATABASE_URL,
     poolclass=NullPool,
-    # echo=True,
+    echo=True,
     connect_args={"application_name": f"host>>{socket.gethostname()}"},
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Dependency
+
 def get_db():
     db = SessionLocal()
     try:

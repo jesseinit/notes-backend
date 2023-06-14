@@ -4,7 +4,7 @@ variable "region" {
 }
 
 variable "profile" {
-  default     = "dev01" #or init-1
+  default     = "default" #or init-1
   description = "AWS Credentials profile to be used"
 }
 

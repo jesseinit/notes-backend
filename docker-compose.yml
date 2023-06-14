@@ -5,12 +5,17 @@ services:
     build: .
     image: notes-api
     container_name: notes-api
-    entrypoint: ["bash","-c","./k8s/scripts/migrate-db.sh && ./k8s/scripts/api.sh"]
+    entrypoint:
+      [
+        "bash",
+        "-c",
+        "./k8s/scripts/migrate-db.sh && ./k8s/scripts/api.sh"
+      ]
     volumes:
       - venv:/app/.venv
       - .:/app
     ports:
-      - 8023:8022
+      - 8022:8022
     environment:
       # - ENV=app-runner
       - DATABASE_HOST=db-pool
@@ -27,22 +32,22 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=notes_db
-  
+
   # psql postgres://postgres:postgres@127.0.0.1:5499/pgbouncer
   pgbouncer:
     container_name: db-pool
     image: edoburu/pgbouncer
     environment:
-       - DB_USER=postgres
-       - DB_PASSWORD=postgres
-       - DB_HOST=notes-db
-       - DB_NAME=notes_db
-       - POOL_MODE=session
-       - ADMIN_USERS=postgres
-       - LISTEN_PORT=5499
-       - VERBOSE=1
-       - DEFAULT_POOL_SIZE=300
-       - MAX_CLIENT_CONN=10000
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=notes-db
+      - DB_NAME=notes_db
+      - POOL_MODE=session
+      - ADMIN_USERS=postgres
+      - LISTEN_PORT=5499
+      - VERBOSE=1
+      - DEFAULT_POOL_SIZE=300
+      - MAX_CLIENT_CONN=10000
     ports:
       - "5432:5499"
 volumes:

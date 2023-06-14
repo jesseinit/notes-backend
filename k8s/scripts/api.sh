@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 let WORKER_COUNT=2*$(nproc)+1
 
 echo "Starting API Server."
