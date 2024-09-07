@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.post("/auth/register", status_code=201)
-def register_user(payload: user_schemas.CreateUserInputSchema, session: Session = Depends(get_db)):
+def register_user(payload: user_schemas.CreateUserInputSchema, session=Depends(get_db)):
     user = UserDAL.get_existing_user(
         username=payload.username, email=payload.email, session=session
     )
@@ -27,7 +27,7 @@ def register_user(payload: user_schemas.CreateUserInputSchema, session: Session 
 
 
 @router.post("/auth/login", status_code=200)
-def login_user(payload: user_schemas.UserLoginInputSchema, session: Session = Depends(get_db)):
+def login_user(payload: user_schemas.UserLoginInputSchema, session=Depends(get_db)):
     user = UserDAL.get_user_by_username(username=payload.username, session=session)
     if not user:
         return JSONResponse(

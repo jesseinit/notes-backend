@@ -18,7 +18,7 @@ ENV PIP_DEFAULT_TIMEOUT=100
 
 # poetry
 # https://python-poetry.org/docs/configuration/#using-environment-variables
-ENV POETRY_VERSION=1.2.2
+ENV POETRY_VERSION=1.8.3
 # make poetry install to this location
 ENV POETRY_HOME="/opt/poetry"
 ENV POETRY_VIRTUALENVS_PATH=".venv" 
@@ -34,7 +34,7 @@ RUN curl -sSL https://install.python-poetry.org | python
 
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry install --no-root
+RUN poetry install
 
 COPY . .
 

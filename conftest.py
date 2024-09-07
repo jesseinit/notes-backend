@@ -9,6 +9,13 @@ from starlette.testclient import TestClient
 from db.base import metadata
 from main import app
 
+import os
+
+
+@pytest.fixture(autouse=True)
+def set_env_vars():
+    os.environ["TESTING"] = "True"
+
 
 @pytest.fixture(scope="function", autouse=True)
 def setup_db():

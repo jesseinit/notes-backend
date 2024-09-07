@@ -7,16 +7,13 @@ from sqlalchemy.pool import NullPool
 
 from helpers.logger import logger
 
-if os.getenv("TESTING"):
-    DATABASE_URL = os.getenv("DATABASE_URL_TEST")
-else:
-    DATABASE_URL = os.getenv("DATABASE_URL")
+
+DATABASE_URL = os.getenv("DATABASE_URL_TEST") if os.getenv("TESTING") else os.getenv("DATABASE_URL")
 
 engine = create_engine(
     DATABASE_URL,
     poolclass=NullPool,
     echo=True,
-    connect_args={"application_name": f"host>>{socket.gethostname()}"},
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
