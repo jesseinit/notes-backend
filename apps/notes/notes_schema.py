@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional, Union
 
-from pydantic import UUID4, BaseModel, Field
+from pydantic import BaseModel, Field
 
 
 class NoteStatus(str, Enum):

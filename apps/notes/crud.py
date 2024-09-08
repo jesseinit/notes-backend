@@ -1,11 +1,9 @@
 from datetime import datetime, timezone
 from typing import List, Union
 
-from pydantic.types import UUID4
-
 from apps.notes.models import Notes as NotesModel
 from apps.notes.notes_schema import CreateNoteSchema
-from db.session import get_db, SessionLocal as Session
+from db.session import SessionLocal as Session
 
 
 def create_new_note(payload: CreateNoteSchema, owner_id: int, session: Session) -> NotesModel:

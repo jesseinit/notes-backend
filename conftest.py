@@ -9,19 +9,16 @@ from starlette.testclient import TestClient
 from db.base import metadata
 from main import app
 
-import os
-
 
 @pytest.fixture(autouse=True)
 def set_env_vars():
     os.environ["TESTING"] = "True"
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def setup_db():
     """Fixture that returns provisions the test database and tables"""
-    DATABASE_URL = os.getenv("DATABASE_URL_TEST")
-    engine = create_engine(DATABASE_URL)
+    engine = create_engine(url=os.getenv("DATABASE_URL_TEST"))
     if not database_exists(url=engine.url):
         create_database(url=engine.url)
     metadata.create_all(bind=engine)

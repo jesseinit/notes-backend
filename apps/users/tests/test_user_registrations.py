@@ -1,11 +1,10 @@
 # from apps.users.models import Users as UsersModel
 from factories import UserFactory
 
-from apps.users import crud
 from main import app
 
 
-def test_register_user__success(test_app, monkeypatch):
+def test_register_user__success(test_app):
     test_request_payload = {
         "username": "bingoman",
         "first_name": "Jesse",
@@ -26,7 +25,7 @@ def test_register_user__success(test_app, monkeypatch):
     assert response_data["data"]
 
 
-def test_register_user__exisiting_user(test_app, monkeypatch):
+def test_register_user__exisiting_user(test_app):
     test_request_payload = {
         "username": "bingoman2",
         "first_name": "Jesse",
@@ -35,8 +34,7 @@ def test_register_user__exisiting_user(test_app, monkeypatch):
         "password": "bigmanthing",
     }
 
-    # TODO: Fix ME - Test hangs as a result of Session related issues
-    # UserFactory(**test_request_payload)
+    UserFactory(**test_request_payload)
 
     test_app.post(
         app.url_path_for("register_user"),
@@ -51,4 +49,4 @@ def test_register_user__exisiting_user(test_app, monkeypatch):
     assert response.status_code == 409
     response_data = response.json()
     assert response_data["msg"] == "Username or Email has been taken"
-    assert response_data["data"] == None
+    assert response_data["data"] is None

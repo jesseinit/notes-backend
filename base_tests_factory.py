@@ -9,4 +9,4 @@ class BaseSQLAlchemyModelFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         abstract = True  # Cannot initialize
         sqlalchemy_session = next(get_db())
-        sqlalchemy_session_persistence = "flush"
+        sqlalchemy_session_persistence = "commit"

@@ -7,7 +7,6 @@ Create Date: 2022-12-18 07:59:09.027024
 """
 import sqlalchemy as sa
 import sqlalchemy_utils
-from sqlalchemy.dialects import postgresql
 
 from alembic import op
 
@@ -40,9 +39,7 @@ def upgrade():
         sa.Column("password", sa.String(), nullable=True),
         sa.Column(
             "status",
-            sqlalchemy_utils.types.choice.ChoiceType(
-                Users.ACTIVE_STATE, impl=sa.String()
-            ),
+            sqlalchemy_utils.types.choice.ChoiceType(Users.ACTIVE_STATE, impl=sa.String()),
             nullable=False,
         ),
         sa.Column("is_verified", sa.Boolean(), nullable=True),
@@ -68,9 +65,7 @@ def upgrade():
             nullable=False,
         ),
         sa.Column("owner_id", sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["owner_id"], ["users.id"], name=op.f("fk_notes_owner_id_users")
-        ),
+        sa.ForeignKeyConstraint(["owner_id"], ["users.id"], name=op.f("fk_notes_owner_id_users")),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_notes")),
     )
     # ### end Alembic commands ###

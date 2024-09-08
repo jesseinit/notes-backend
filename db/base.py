@@ -1,7 +1,6 @@
 from sqlalchemy import Column, DateTime, Integer, MetaData
-from sqlalchemy.ext.declarative import as_declarative, declared_attr
-from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase, declared_attr
+from sqlalchemy.sql import func
 
 # NOTE: This is very important or else you'd have errors in your migration without appropriate contraint naming which will cause
 # migration(alembic) downgrade errors.

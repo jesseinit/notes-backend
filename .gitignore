@@ -12,6 +12,7 @@ __pycache__
 *.log
 load-testing/
 *.db
+.ruff_cache
 
 # Local .terraform directories
 **/.terraform/*

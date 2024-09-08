@@ -3,8 +3,8 @@ from fastapi.responses import JSONResponse
 
 import apps.users.users_schema as user_schemas
 from apps.users import crud as UserDAL
+from db.session import get_db
 from helpers.utils import HashManager, JWTBearer
-from db.session import get_db, SessionLocal as Session
 
 router = APIRouter()
 

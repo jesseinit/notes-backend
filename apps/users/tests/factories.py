@@ -1,7 +1,6 @@
 import factory
 from faker import Faker
 
-
 import base_tests_factory as base_factory
 from apps.users.models import Users
 

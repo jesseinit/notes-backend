@@ -1,16 +1,16 @@
 import socket
-from helpers.logger import logger
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic.error_wrappers import ValidationError
 
-load_dotenv()
-
-
 from apps.notes import notes_view as note_app
 from apps.users import users_view as user_app
+from helpers.logger import logger
+
+load_dotenv()
+
 
 app = FastAPI(title="Notes API")
 
@@ -19,7 +19,7 @@ app = FastAPI(title="Notes API")
 async def validation_handler(request: Request, exc: ValidationError):
     return JSONResponse(
         status_code=400,
-        content={"msg": f"Oops! Validation Error Occured", "data": exc.errors()},
+        content={"msg": "Oops! Validation Error Occured", "data": exc.errors()},
     )
 
 
